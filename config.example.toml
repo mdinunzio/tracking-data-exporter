@@ -4,7 +4,7 @@ default_days = 7
 # Output directory for exports
 output_dir = "~/tracking-exports"
 # Path to the life coach prompt file (copied to clipboard after export)
-prompt_file = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Projects/Projects/Life Coach/Current Prompt.md"
+prompt_file = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Projects/Life Coach/Current Prompt.md"
 
 [obsidian]
 enabled = true
@@ -12,11 +12,11 @@ vault_path = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian"
 
 [google_sheets]
 enabled = false
-# Path to Google OAuth credentials JSON (downloaded from Google Cloud Console)
-credentials_file = "~/.config/tracking-exporter/google-credentials.json"
-# Path to store OAuth token after first auth
-token_file = "~/.config/tracking-exporter/google-token.json"
+# Google API key (create at https://console.cloud.google.com/apis/credentials)
+# Enable the Google Sheets API, then create an API key
+api_key = ""
 # Spreadsheet ID (from the URL: https://docs.google.com/spreadsheets/d/{THIS_PART}/edit)
+# The spreadsheet must be shared as "Anyone with the link can view"
 spreadsheet_id = ""
 # Sheet name and range to export
 sheet_range = "Sheet1!A:Z"
@@ -40,6 +40,6 @@ pickup_dir = "~/Library/Mobile Documents/com~apple~Shortcuts/Documents/Health Ex
 
 [google_calendar]
 enabled = false
-credentials_file = "~/.config/tracking-exporter/google-credentials.json"
-token_file = "~/.config/tracking-exporter/google-token.json"
+# Google API key (same as google_sheets, also enable Calendar API)
+api_key = ""
 calendar_ids = ["primary"]
