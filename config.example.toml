@@ -1,0 +1,45 @@
+[general]
+# Default number of days to export (overridden by --days CLI flag)
+default_days = 7
+# Output directory for exports
+output_dir = "~/tracking-exports"
+# Path to the life coach prompt file (copied to clipboard after export)
+prompt_file = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Projects/Projects/Life Coach/Current Prompt.md"
+
+[obsidian]
+enabled = true
+vault_path = "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian"
+
+[google_sheets]
+enabled = false
+# Path to Google OAuth credentials JSON (downloaded from Google Cloud Console)
+credentials_file = "~/.config/tracking-exporter/google-credentials.json"
+# Path to store OAuth token after first auth
+token_file = "~/.config/tracking-exporter/google-token.json"
+# Spreadsheet ID (from the URL: https://docs.google.com/spreadsheets/d/{THIS_PART}/edit)
+spreadsheet_id = ""
+# Sheet name and range to export
+sheet_range = "Sheet1!A:Z"
+
+[ynab]
+enabled = false
+# Personal access token from https://app.ynab.com/settings/developer
+access_token = ""
+# Budget ID (use "last-used" for most recent budget)
+budget_id = "last-used"
+
+[streaks]
+enabled = false
+# Directory where the Apple Shortcut drops the export file
+pickup_dir = "~/Library/Mobile Documents/com~apple~Shortcuts/Documents/Streaks Exports"
+
+[apple_health]
+enabled = false
+# Directory where the Apple Shortcut drops the export file
+pickup_dir = "~/Library/Mobile Documents/com~apple~Shortcuts/Documents/Health Exports"
+
+[google_calendar]
+enabled = false
+credentials_file = "~/.config/tracking-exporter/google-credentials.json"
+token_file = "~/.config/tracking-exporter/google-token.json"
+calendar_ids = ["primary"]
