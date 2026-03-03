@@ -214,3 +214,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Tracking Data Exporter
+config.toml
+exports/
+*.zip
