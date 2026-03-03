@@ -15,7 +15,7 @@ def run_export(
     output_dir: Path | None = None,
     only: list[str] | None = None,
     exclude: list[str] | None = None,
-    zip_output: bool = True,
+    zip_output: bool = False,
     copy_prompt: bool = True,
     verbose: bool = False,
 ) -> Path:
@@ -23,7 +23,7 @@ def run_export(
     if output_dir is None:
         output_dir = Path(config["general"]["output_dir"]).expanduser()
 
-    export_name = f"export-{start_date}-to-{end_date}"
+    export_name = f"export-{date.today()}"
     export_dir = output_dir / export_name
     export_dir.mkdir(parents=True, exist_ok=True)
 
@@ -144,7 +144,12 @@ def _copy_prompt_to_clipboard(prompt_path: Path) -> None:
 
 
 def _print_status(status: str, name: str, message: str) -> None:
-    colors = {"OK": "\033[32m", "ERR": "\033[31m", "OFF": "\033[90m", "SKIP": "\033[33m"}
+    colors = {
+        "OK": "\033[32m",
+        "ERR": "\033[31m",
+        "OFF": "\033[90m",
+        "SKIP": "\033[33m",
+    }
     reset = "\033[0m"
     color = colors.get(status, "")
     print(f"  {color}[{status:>4}]{reset} {name}: {message}")

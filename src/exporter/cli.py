@@ -48,7 +48,7 @@ def main() -> None:
     parser.add_argument("--output-dir", help="Output directory (overrides config)")
     parser.add_argument("--only", nargs="+", choices=list(EXPORTERS.keys()), help="Run only these exporters")
     parser.add_argument("--exclude", nargs="+", choices=list(EXPORTERS.keys()), help="Skip these exporters")
-    parser.add_argument("--no-zip", action="store_true", help="Output as directory instead of zip")
+    parser.add_argument("--zip", action="store_true", help="Output as zip instead of directory")
     parser.add_argument("--no-prompt-copy", action="store_true", help="Don't copy prompt to clipboard")
     parser.add_argument("--list-sources", action="store_true", help="List available exporters and exit")
     parser.add_argument("--verbose", action="store_true", help="Verbose output")
@@ -81,7 +81,7 @@ def main() -> None:
         output_dir=output_dir,
         only=args.only,
         exclude=args.exclude,
-        zip_output=not args.no_zip,
+        zip_output=args.zip,
         copy_prompt=not args.no_prompt_copy,
         verbose=args.verbose,
     )

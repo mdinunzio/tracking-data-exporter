@@ -1,5 +1,4 @@
 import re
-import shutil
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -22,37 +21,52 @@ class ObsidianExporter(BaseExporter):
         if not self.vault_path:
             errors.append("obsidian.vault_path is required")
         elif not self.vault_path.is_dir():
-            errors.append(f"obsidian.vault_path does not exist: {self.vault_path}")
+            errors.append(
+                f"obsidian.vault_path does not exist: "
+                f"{self.vault_path}"
+            )
         return errors
 
-    def export(self, start_date: date, end_date: date, output_dir: Path) -> ExportResult:
-        dest = output_dir / "obsidian"
-        dest.mkdir(parents=True, exist_ok=True)
+    def export(
+        self,
+        start_date: date,
+        end_date: date,
+        output_dir: Path,
+    ) -> ExportResult:
+        parts: list[str] = []
+        count = 0
 
-        exported: list[Path] = []
         for entry in sorted(self.vault_path.iterdir()):
             if not entry.is_file():
                 continue
             match = DATE_PATTERN.match(entry.name)
             if not match:
                 continue
-            file_date = datetime.strptime(match.group(1), "%Y-%m-%d").date()
+            file_date = datetime.strptime(
+                match.group(1), "%Y-%m-%d"
+            ).date()
             if start_date <= file_date <= end_date:
-                dest_file = dest / entry.name
-                shutil.copy2(entry, dest_file)
-                exported.append(dest_file)
+                text = entry.read_text(errors="replace")
+                parts.append(f"# {file_date}\n\n{text}")
+                count += 1
 
-        if not exported:
+        if not parts:
             return ExportResult(
                 source_name=self.display_name,
                 success=True,
-                message=f"No journal entries found for {start_date} to {end_date}",
+                message=(
+                    f"No journal entries found for "
+                    f"{start_date} to {end_date}"
+                ),
             )
+
+        out_file = output_dir / "Journal.md"
+        out_file.write_text("\n\n---\n\n".join(parts))
 
         return ExportResult(
             source_name=self.display_name,
             success=True,
-            files_exported=exported,
-            record_count=len(exported),
-            message=f"Exported {len(exported)} journal entries",
+            files_exported=[out_file],
+            record_count=count,
+            message=f"Concatenated {count} days into Journal.md",
         )

@@ -1,9 +1,11 @@
-import shutil
-from datetime import date
+import re
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 from .base import BaseExporter, ExportResult
+
+DATE_PATTERN = re.compile(r"^(\d{4}-\d{2}-\d{2})\.md$")
 
 
 class AppleHealthExporter(BaseExporter):
@@ -12,43 +14,59 @@ class AppleHealthExporter(BaseExporter):
 
     def __init__(self, config: dict[str, Any]):
         super().__init__(config)
-        self.pickup_dir = Path(config.get("pickup_dir", ""))
+        self.vault_path = Path(config.get("vault_path", ""))
 
     def validate_config(self) -> list[str]:
         errors = []
-        if not self.pickup_dir:
-            errors.append("apple_health.pickup_dir is required")
+        if not self.vault_path:
+            errors.append("apple_health.vault_path is required")
+        elif not self.vault_path.is_dir():
+            errors.append(
+                f"apple_health.vault_path does not exist: "
+                f"{self.vault_path}"
+            )
         return errors
 
-    def export(self, start_date: date, end_date: date, output_dir: Path) -> ExportResult:
-        if not self.pickup_dir.is_dir():
+    def export(
+        self,
+        start_date: date,
+        end_date: date,
+        output_dir: Path,
+    ) -> ExportResult:
+        parts: list[str] = []
+        count = 0
+
+        for entry in sorted(self.vault_path.iterdir()):
+            if not entry.is_file():
+                continue
+            match = DATE_PATTERN.match(entry.name)
+            if not match:
+                continue
+            file_date = datetime.strptime(
+                match.group(1), "%Y-%m-%d"
+            ).date()
+            if start_date <= file_date <= end_date:
+                text = entry.read_text(errors="replace")
+                parts.append(f"# {file_date}\n\n{text}")
+                count += 1
+
+        if not parts:
             return ExportResult(
                 source_name=self.display_name,
                 success=True,
-                message=f"Pickup directory not found: {self.pickup_dir} (run the Health export Shortcut first)",
+                message=(
+                    f"No health entries found for "
+                    f"{start_date} to {end_date}"
+                ),
             )
 
-        files = sorted(self.pickup_dir.iterdir(), key=lambda f: f.stat().st_mtime, reverse=True)
-        export_files = [f for f in files if f.is_file() and f.suffix in (".csv", ".json", ".xml", ".zip")]
-
-        if not export_files:
-            return ExportResult(
-                source_name=self.display_name,
-                success=True,
-                message="No export files found in pickup directory",
-            )
-
-        dest = output_dir / "apple-health"
-        dest.mkdir(parents=True, exist_ok=True)
-
-        latest = export_files[0]
-        dest_file = dest / latest.name
-        shutil.copy2(latest, dest_file)
+        out_file = output_dir / "Health.md"
+        out_file.write_text("\n\n---\n\n".join(parts))
 
         return ExportResult(
             source_name=self.display_name,
             success=True,
-            files_exported=[dest_file],
-            record_count=1,
-            message=f"Copied {latest.name}",
+            files_exported=[out_file],
+            record_count=count,
+            message=f"Concatenated {count} days into Health.md",
         )

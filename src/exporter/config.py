@@ -4,8 +4,8 @@ from typing import Any
 
 DEFAULT_CONFIG = {
     "general": {
-        "default_days": 7,
-        "output_dir": "~/tracking-exports",
+        "default_days": 30,
+        "output_dir": "~/Downloads",
         "prompt_file": "",
     },
 }
