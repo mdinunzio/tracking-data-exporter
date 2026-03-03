@@ -32,8 +32,6 @@ class YnabExporter(BaseExporter):
         return resp.json()["data"]
 
     def export(self, start_date: date, end_date: date, output_dir: Path) -> ExportResult:
-        dest = output_dir / "ynab"
-        dest.mkdir(parents=True, exist_ok=True)
         exported: list[Path] = []
         total_records = 0
 
@@ -48,7 +46,7 @@ class YnabExporter(BaseExporter):
                 if t["date"] <= end_date.isoformat()
             ]
             if transactions:
-                path = dest / "transactions.csv"
+                path = output_dir / "ynab_transactions.csv"
                 _write_transactions_csv(path, transactions)
                 exported.append(path)
                 total_records += len(transactions)
@@ -64,7 +62,7 @@ class YnabExporter(BaseExporter):
             data = self._get(f"/budgets/{self.budget_id}/accounts")
             accounts = [a for a in data["accounts"] if not a.get("deleted")]
             if accounts:
-                path = dest / "accounts.csv"
+                path = output_dir / "ynab_accounts.csv"
                 _write_accounts_csv(path, accounts)
                 exported.append(path)
         except httpx.HTTPStatusError:
@@ -83,7 +81,7 @@ class YnabExporter(BaseExporter):
                     cat["group_name"] = group["name"]
                     categories.append(cat)
             if categories:
-                path = dest / "categories.csv"
+                path = output_dir / "ynab_categories.csv"
                 _write_categories_csv(path, categories)
                 exported.append(path)
         except httpx.HTTPStatusError:
